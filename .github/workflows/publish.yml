@@ -20,7 +20,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 2
           persist-credentials: false
@@ -48,11 +48,11 @@ jobs:
 
       - name: Setup bun
         if: steps.changes.outputs.sim == 'true'
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
 
       - name: Setup Node.js
         if: steps.changes.outputs.sim == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
@@ -133,8 +133,10 @@ jobs:
 
       - name: Shutdown simulator
         if: always() && steps.boot-sim.outputs.udid != ''
+        env:
+          UDID: ${{ steps.boot-sim.outputs.udid }}
         run: |
-          xcrun simctl shutdown "${{ steps.boot-sim.outputs.udid }}" || true
+          xcrun simctl shutdown "$UDID" || true
 
       - name: Build and publish serve-sim beta
         if: steps.changes.outputs.sim == 'true'

@@ -12,6 +12,9 @@ concurrency:
   group: sim-test-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   sim-test:
     runs-on: macos-26
@@ -22,8 +25,10 @@ jobs:
     # wedge; a real regression still fails both attempts.
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
@@ -100,4 +105,6 @@ jobs:
 
       - name: Shutdown simulator
         if: always() && steps.boot-sim.outputs.udid != ''
-        run: xcrun simctl shutdown "${{ steps.boot-sim.outputs.udid }}" || true
+        env:
+          UDID: ${{ steps.boot-sim.outputs.udid }}
+        run: xcrun simctl shutdown "$UDID" || true
